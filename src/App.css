@@ -25,9 +25,27 @@
 }
 
 .title {
-  
 }
 
+.word {
+}
+.Form {
+  margin-top: 20px;
+}
+p {
+  margin-top: 0px;
+}
+
+h2 {
+  margin-bottom: 0px;
+  font-size: calc(10px + 2vmin);
+}
+.Word-bank {
+  margin-top: 100px;
+  background-color: #61dafb;
+  width: 90%;
+  height: 400px;
+}
 .App-link {
   color: #61dafb;
 }
