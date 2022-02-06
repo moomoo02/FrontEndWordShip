@@ -36,6 +36,8 @@ function App() {
   useEffect(async () => {
     let temp = await getWord();
     setHotWord(temp);
+    let newList = await getWordList();
+    setWordList(newList);
   }, []);
 
   async function sendWord() {
@@ -43,18 +45,24 @@ function App() {
     let res = await axios.post("https://backendwordship.herokuapp.com/words", {
       input: word,
     });
+    // let res = await axios.post("http://localhost:5000/words", {
+    //   input: word,
+    // });
     console.log(res.data.code);
     //0 - not a word, 1 - is a duplicate, 2 - sucess
     return parseInt(res.data.code);
   }
   async function getWord() {
     let res = await axios.get("https://backendwordship.herokuapp.com/words");
+    // let res = await axios.get("http://localhost:5000/words");
     console.log(res.data);
     return res.data;
   }
-  // async function getWordList() {
-  //   let res = await axios.get("https:")
-  // }
+  async function getWordList() {
+    let res = await axios.get("https://backendwordship.herokuapp.com/list");
+    // let res = await axios.get("http://localhost:5000/list");
+    return res.data;
+  }
   //In the case of enter key being pressed
   async function handler({ key }) {
     if (key == "Enter") {
@@ -78,7 +86,10 @@ function App() {
     let isValid = await sendWord();
 
     if (isValid == 2) {
-      setWordList([...wordList, word]);
+      let newList = await getWordList();
+      console.log("New List");
+      console.log(newList);
+      setWordList(newList);
       setFeedBack("Sucessfully sent!");
       setOn(1);
       // alert(word + " was sucessfully sent!");
@@ -119,7 +130,7 @@ function App() {
         <div className="Form">
           <RICIBs
             amount={amount}
-            autoFocus={1}
+            autoFocus={true}
             handleOutputString={(string) => {
               setWord(string);
             }}
@@ -155,11 +166,10 @@ function App() {
           {/* <Button onClick={getWord}>get</Button> */}
         </div>
         <div className="Word-bank">
-          {" "}
           <Grid
             container
             spacing={{ xs: 2, md: 3 }}
-            columns={{ xs: 4, sm: 4, md: 4 }}
+            columns={{ xs: 5, sm: 5, md: 5 }}
           >
             {wordList.map((_, index) => (
               <Grid item xs={1} sm={1} md={1} key={index}>
