@@ -1,0 +1,16 @@
+---
+handlers:
+  - secure: always
+    static_dir: build/static
+    url: /static
+  - secure: always
+    static_files: build/\1
+    upload: build/.*\.(json|ico|js)$
+    url: /(.*\.(json|ico|js))$
+  - secure: always
+    static_files: build/index.html
+    upload: build/index.html
+    url: .*
+manual_scaling:
+  instances: 1
+runtime: nodejs16
