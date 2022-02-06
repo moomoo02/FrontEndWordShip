@@ -24,43 +24,64 @@ const Item = styled(Paper)(({ theme }) => ({
 const endpoint = "http://localhost:5000";
 
 function App() {
+  const [hotWord, setHotWord] = useState("");
   const [word, setWord] = useState("w");
   const [amount, setAmount] = useState(5);
   const [wordList, setWordList] = useState([]);
 
-  useEffect(() => {}, []);
+  useEffect(async () => {
+    let temp = await getWord();
+    setHotWord(temp);
+  }, []);
 
   async function sendWord() {
     // const json = JSON.stringify({ event: word, data: "among us" });
     let res = await axios.post(endpoint + "/words", { input: word });
-    // console.log(res.data.isValid);
-    // console.log(typeof parseInt(res.data.isValid));
-    // console.log(res.data.isValid == 1);
-    return parseInt(res.data.isValid);
+    console.log(res.data.code);
+    //0 - not a word, 1 - is a duplicate, 2 - sucess
+    return parseInt(res.data.code);
   }
   async function getWord() {
     let res = await axios.get(endpoint + "/words");
-    console.log(res);
+    console.log(res.data);
+    return res.data;
   }
   //In the case of enter key being pressed
-  function handler({ key }) {
+  async function handler({ key }) {
     if (key == "Enter") {
       if (word.length == 5) {
-        setAmount(0);
-        setTimeout(function () {
-          setAmount(5);
-          // Something you want delayed.
-        }, 50); // How long you want the delay to be, measured in milliseconds.
-        setWordList([...wordList, word]);
-        setTimeout(function () {
-          setWord("");
-          // Something you want delayed.
-        }, 50); // How long you want the delay to be, measured in milliseconds.
-        alert(word);
+        await submit();
       }
     }
   }
 
+  async function submit() {
+    if (word.length != 5) {
+      alert("Your word must be 5 letters :)");
+      return;
+    }
+
+    //send word to backend and check if it is a valid word or not
+    let isValid = await sendWord();
+
+    if (isValid == 2) {
+      setWordList([...wordList, word]);
+      alert(word + " was sucessfully sent!");
+    } else if (isValid == 1) {
+      alert(word + " is a duplicate, try again :)");
+    } else if (isValid == 0) {
+      alert(word + " is not a valid word, try again :)");
+    }
+
+    //clear input
+    setAmount(0);
+    setTimeout(function () {
+      setAmount(5);
+    }, 50);
+
+    //Clear word state
+    setWord("");
+  }
   useEventListener("keydown", handler);
 
   return (
@@ -69,7 +90,7 @@ function App() {
         <h1 className="Title">Wordship!</h1>
         <div className="Word">
           <h2>Your Word:</h2>
-          <p>Glyph</p>
+          <p>{hotWord}</p>
         </div>
         <div className="Form">
           <RICIBs
@@ -91,36 +112,12 @@ function App() {
             style={{ marginTop: "40px" }}
             sx={{ size: "large" }}
             variant="contained"
-            onClick={async () => {
-              if (word.length != 5) {
-                alert("Your word must be 5 letters :)");
-                return;
-              }
-
-              //send word to backend and check if it is a valid word or not
-              let isValid = await sendWord();
-
-              if (isValid == 1) {
-                setWordList([...wordList, word]);
-                alert(word + " was sucessfully sent!");
-              } else {
-                alert(word + " is a duplicate, try another :)");
-              }
-
-              //clear input
-              setAmount(0);
-              setTimeout(function () {
-                setAmount(5);
-              }, 50);
-
-              //Clear word state
-              setWord("");
-            }}
+            onClick={submit}
             endIcon={<SendIcon />}
           >
             Send
           </Button>
-          {/* <Button onClick={getWord}>get</Button> */}
+          <Button onClick={getWord}>get</Button>
         </div>
         <div className="Word-bank">
           {" "}
