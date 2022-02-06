@@ -117,7 +117,7 @@ function App() {
           >
             Send
           </Button>
-          <Button onClick={getWord}>get</Button>
+          {/* <Button onClick={getWord}>get</Button> */}
         </div>
         <div className="Word-bank">
           {" "}
